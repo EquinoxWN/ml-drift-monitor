@@ -1,0 +1,39 @@
+name: drift-schedule
+
+# The scheduled job as it would run in production: compare every new live batch with the stored
+# reference window. Here the batches are the synthetic demo data, regenerated on each run; a real
+# deployment keeps the reference, the live folder and the reports folder (with state.json) in storage.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: drift-schedule
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e .
+      - name: Check new batches
+        run: |
+          drift synth --out .tmp/demo
+          drift reference --training .tmp/demo/training.csv --schema .tmp/demo/schema.json --out .tmp/demo/reference.json
+          set +e
+          drift run --reference .tmp/demo/reference.json --live .tmp/demo/live --out .tmp/demo/reports | tee .tmp/run.log
+          code=${PIPESTATUS[0]}
+          set -e
+          result=$(grep '^RESULT' .tmp/run.log)
+          if [ "$code" -eq 1 ]; then echo "::warning title=drift found::$result"; elif [ "$code" -eq 0 ]; then echo "::notice title=no drift::$result"; else exit "$code"; fi
