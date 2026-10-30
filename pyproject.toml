@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=80"]
+requires = ["setuptools>=84.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,11 +9,11 @@ description = "Catches a model quietly getting worse in production before your u
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
-dependencies = ["numpy>=2.2,<3"]
+dependencies = ["numpy>=2.4,<3"]
 
 [project.optional-dependencies]
 # SciPy is a test oracle only: the statistics are implemented with numpy and checked against it.
-dev = ["pytest>=8", "hypothesis>=6.100", "scipy>=1.15", "ruff>=0.6", "mypy>=1.11", "pip-audit>=2.7"]
+dev = ["pytest>=9.2", "hypothesis>=6.170", "scipy>=1.17", "ruff>=0.17", "mypy>=2.4", "pip-audit>=2.10"]
 
 [project.scripts]
 drift = "ml_drift_monitor.cli:main"
