@@ -72,6 +72,8 @@ def _dispatch(args: argparse.Namespace, out: TextIO) -> int:
         return 0
     if args.cmd == "reference":
         spec = json.loads(args.schema.read_text(encoding="utf-8"))
+        if not isinstance(spec, dict) or "features" not in spec:
+            raise ValueError(f"{args.schema}: expected an object with a features list")
         features = parse_schema(spec["features"])
         ref = reference.build(read_csv(args.training, features), features, args.training)
         reference.save(ref, args.out)

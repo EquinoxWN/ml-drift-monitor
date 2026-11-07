@@ -38,7 +38,11 @@ def parse_schema(spec: list[dict[str, str]]) -> list[Feature]:
     """Validate a schema: unique names, known kinds, at least one feature."""
     features: list[Feature] = []
     seen: set[str] = set()
+    if not isinstance(spec, list):
+        raise ValueError("schema features must be a list")
     for item in spec:
+        if not isinstance(item, dict):
+            raise ValueError(f"schema entry {item!r} is not an object")
         name, kind = item.get("name", ""), item.get("kind", "")
         if not name or len(name) > 64 or name in seen:
             raise ValueError(f"feature name {name!r} empty, too long or repeated")
