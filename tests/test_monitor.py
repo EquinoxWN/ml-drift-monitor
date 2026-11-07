@@ -92,3 +92,14 @@ def test_missing_column_is_an_error(ref: reference.Reference) -> None:
 )
 def test_decision_rule(psi: float, p: float | None, want: str) -> None:
     assert monitor.decide(psi, p, monitor.Thresholds())[0] == want
+
+
+def test_psi_exactly_at_the_drift_band_is_drift() -> None:
+    assert monitor.decide(0.2, 0.5, monitor.Thresholds())[0] == "drift"
+
+
+def test_a_batch_with_exactly_min_rows_values_is_checked(ref: reference.Reference, make_batch: MakeBatch) -> None:
+    report = monitor.check(ref, make_batch(200, 501), "exact", monitor.Thresholds(min_rows=200))
+    full = [f for f in report.features if f.rows == 200]
+    assert full, "expected at least one feature with no missing values"
+    assert all(f.status != "insufficient" for f in full)

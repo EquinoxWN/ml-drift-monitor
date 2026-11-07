@@ -66,3 +66,22 @@ def test_concurrent_runs_are_refused(ref: reference.Reference, tmp_path: Path) -
     with pytest.raises(jobs.LockedError):
         jobs.run_pending(ref, live, out)
     assert not (out / "batch-01.json").exists()
+
+
+def test_one_run_checks_at_most_the_batch_cap(
+    ref: reference.Reference, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    live = _live(tmp_path, ["none", "none", "none"])
+    monkeypatch.setattr(jobs, "MAX_BATCHES_PER_RUN", 2)
+    first = jobs.run_pending(ref, live, tmp_path / "reports")
+    assert [r.batch for r in first.checked] == ["batch-01.csv", "batch-02.csv"]
+
+
+def test_a_state_file_of_the_wrong_shape_is_refused(ref: reference.Reference, tmp_path: Path) -> None:
+    live = _live(tmp_path, ["none"])
+    out = tmp_path / "reports"
+    out.mkdir()
+    (out / "state.json").write_text("[1, 2]")
+    with pytest.raises(ValueError, match="not a map"):
+        jobs.run_pending(ref, live, out)
+    assert not (out / ".lock").exists()

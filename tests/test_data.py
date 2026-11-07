@@ -63,3 +63,8 @@ def test_schema_validation(spec: list[dict[str, str]]) -> None:
 def test_write_csv_refuses_ragged_columns(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="length"):
         write_csv(tmp_path / "x.csv", {"a": [1, 2], "b": [1]})
+
+
+def test_schema_entries_must_be_objects() -> None:
+    with pytest.raises(ValueError, match="not an object"):
+        parse_schema(["age"])  # type: ignore[list-item]

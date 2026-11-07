@@ -21,7 +21,7 @@ injected changes were drift in 200 of 200 batches with no other feature flagged:
 
 ![false alarms and detection per scenario over 200 batches](docs/proof/detection.jpg)
 
-62 tests pass (the statistics are checked against SciPy), ruff and mypy --strict are clean, and
+70 tests pass (62 when the image below was taken; the statistics are checked against SciPy), ruff and mypy --strict are clean, and
 pip-audit finds no known vulnerabilities:
 
 ![ruff, mypy, pytest and pip-audit output](docs/proof/tests.jpg)
@@ -103,7 +103,7 @@ repository.
 python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\activate
 make setup   # pip install -e ".[dev]"
 make lint    # ruff, ruff format --check, mypy --strict
-make test    # 62 tests
+make test    # 70 tests
 make audit   # pip-audit
 make demo    # synthetic data, reference window, two scheduled runs
 make bench   # 200 batches per scenario
@@ -127,16 +127,16 @@ Latest local run (full detail in [docs/results/m1.md](docs/results/m1.md)):
 | Test file | Tests | What it proves |
 |---|---|---|
 | `tests/test_stats.py` | 14 | PSI properties (Hypothesis); KS statistic, Kolmogorov distribution and chi-square values equal SciPy's; KS p within 0.025 of SciPy's exact method |
-| `tests/test_reference.py` | 9 | Decile bins, sorted sample, category cap; round trip; tampered, unknown-version and inconsistent files refused |
-| `tests/test_monitor.py` | 19 | Stable batches never drift; each injected drift flagged on its own feature only; income shift caught by KS while PSI stays below 0.2; small batches "insufficient"; decision table |
-| `tests/test_jobs.py` | 3 | Each batch checked once; crash keeps finished work and releases the lock; concurrent runs refused |
-| `tests/test_data.py` | 11 | CSV parsing, missing values, refused input, schema validation |
-| `tests/test_cli.py` | 2 | End to end through the command line, exit codes 0, 1 and 2 |
+| `tests/test_reference.py` | 11 | Decile bins, sorted sample, category cap; edge values in the lower bin; round trip; tampered, unknown-version and inconsistent files refused |
+| `tests/test_monitor.py` | 21 | Stable batches never drift; each injected drift flagged on its own feature only; income shift caught by KS while PSI stays below 0.2; small batches "insufficient"; decision table |
+| `tests/test_jobs.py` | 5 | Each batch checked once; crash keeps finished work and releases the lock; concurrent runs refused; batch cap per run; malformed state refused |
+| `tests/test_data.py` | 12 | CSV parsing, missing values, refused input, schema validation |
+| `tests/test_cli.py` | 3 | End to end through the command line, exit codes 0, 1 and 2 |
 | `tests/test_calibration.py` | 4 | 0 drift in 300 stable batches; KS false-alarm rate near alpha; power for 0.5 and 0.1 standard deviation shifts |
 
 | Check | Result |
 |---|---|
-| Tests | 62 passed, 0 failed (warnings are errors) |
+| Tests | 70 passed, 0 failed (warnings are errors) |
 | Lint and types | ruff clean, ruff format clean, mypy --strict: no issues in 17 files |
 | Audit | pip-audit: no known vulnerabilities |
 | Stable data, 200 batches | 0 drift, 7 warn, 193 ok; 0 of 1,200 feature checks flagged drift |
@@ -184,6 +184,7 @@ What this repo must show before it counts as done:
 - [ADR 0002: decide drift from PSI and a significance test together](docs/adr/0002-psi-and-significance-together.md)
 - [ADR 0003: store the reference window as bins, counts and a fixed sample](docs/adr/0003-reference-as-bins-and-sample.md)
 - [M1 results](docs/results/m1.md)
+- [Quality check 2026-11-01](docs/quality/2026-11-01.md): the ten engineering rules, evidence and mutation results
 
 ## Scope
 

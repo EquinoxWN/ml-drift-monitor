@@ -90,3 +90,15 @@ def test_load_refuses_inconsistent_profiles_even_with_a_valid_checksum(
 def test_build_refuses_tiny_windows(features: list[Feature], make_batch) -> None:  # type: ignore[no-untyped-def]
     with pytest.raises(ValueError, match="at least 100 rows"):
         reference.build(make_batch(50, 1), features, Path(__file__))
+
+
+def test_a_value_on_a_bin_edge_counts_in_the_lower_bin() -> None:
+    assert reference.numeric_counts(np.array([1.0, 2.0, 3.0]), [1.0, 2.0]) == [1, 1, 1]
+
+
+def test_unsorted_edges_are_an_inconsistent_profile() -> None:
+    p = reference.FeatureProfile(
+        name="x", kind="numeric", rows=3, null_rate=0.0, edges=[2.0, 1.0], counts=[1, 1, 1], sample=[1.0]
+    )
+    with pytest.raises(ValueError, match="inconsistent"):
+        reference._check_profile(p)

@@ -68,3 +68,12 @@ def test_bad_input_exits_2(tmp_path: Path) -> None:
     bad.write_text('{"version": 1}')
     code, _ = _run("check", "--reference", str(bad), "--batch", str(tmp_path / "b.csv"))
     assert code == 2
+
+
+def test_a_schema_that_is_not_an_object_exits_2(tmp_path: Path) -> None:
+    schema = tmp_path / "schema.json"
+    schema.write_text("[1]")
+    training = tmp_path / "t.csv"
+    training.write_text("a,b" + chr(10) + "1,x" + chr(10))
+    code, _ = _run("reference", "--training", str(training), "--schema", str(schema), "--out", str(tmp_path / "r.json"))
+    assert code == 2
