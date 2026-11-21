@@ -129,7 +129,7 @@ Latest local run (full detail in [docs/results/m1.md](docs/results/m1.md)):
 | `tests/test_stats.py` | 14 | PSI properties (Hypothesis); KS statistic, Kolmogorov distribution and chi-square values equal SciPy's; KS p within 0.025 of SciPy's exact method |
 | `tests/test_reference.py` | 11 | Decile bins, sorted sample, category cap; edge values in the lower bin; round trip; tampered, unknown-version and inconsistent files refused |
 | `tests/test_monitor.py` | 21 | Stable batches never drift; each injected drift flagged on its own feature only; income shift caught by KS while PSI stays below 0.2; small batches "insufficient"; decision table |
-| `tests/test_jobs.py` | 5 | Each batch checked once; crash keeps finished work and releases the lock; concurrent runs refused; batch cap per run; malformed state refused |
+| `tests/test_jobs.py` | 5 | Each batch checked once; crash keeps finished work and releases the lock; concurrent runs refused; batch cap per run counts only new batches; malformed state refused |
 | `tests/test_data.py` | 12 | CSV parsing, missing values, refused input, schema validation |
 | `tests/test_cli.py` | 3 | End to end through the command line, exit codes 0, 1 and 2 |
 | `tests/test_calibration.py` | 4 | 0 drift in 300 stable batches; KS false-alarm rate near alpha; power for 0.5 and 0.1 standard deviation shifts |
