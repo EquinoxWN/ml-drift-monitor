@@ -75,6 +75,8 @@ def test_one_run_checks_at_most_the_batch_cap(
     monkeypatch.setattr(jobs, "MAX_BATCHES_PER_RUN", 2)
     first = jobs.run_pending(ref, live, tmp_path / "reports")
     assert [r.batch for r in first.checked] == ["batch-01.csv", "batch-02.csv"]
+    second = jobs.run_pending(ref, live, tmp_path / "reports")
+    assert [r.batch for r in second.checked] == ["batch-03.csv"]  # the cap counts new batches only
 
 
 def test_a_state_file_of_the_wrong_shape_is_refused(ref: reference.Reference, tmp_path: Path) -> None:

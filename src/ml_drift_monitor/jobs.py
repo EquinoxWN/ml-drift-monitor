@@ -50,10 +50,12 @@ def run_pending(ref: Reference, live_dir: Path, out_dir: Path, th: monitor.Thres
         state: dict[str, str] = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
         if not isinstance(state, dict) or not all(isinstance(v, str) for v in state.values()):
             raise ValueError(f"{state_path} is not a map of batch names to SHA-256 digests")
-        batches = sorted(p for p in live_dir.glob("*.csv") if p.is_file())[:MAX_BATCHES_PER_RUN]
+        batches = sorted(p for p in live_dir.glob("*.csv") if p.is_file())
         checked: list[monitor.Report] = []
         skipped = 0
         for path in batches:
+            if len(checked) >= MAX_BATCHES_PER_RUN:
+                break
             digest = sha256_file(path)
             if state.get(path.name) == digest:
                 skipped += 1
